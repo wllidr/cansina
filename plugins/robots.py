@@ -4,7 +4,7 @@ import sys
 def process_robots(target):
     interesting_entries = []
     try:
-        result = requests.get(target + "/robots.txt")
+        result = requests.get(target + "robots.txt")
         if not result.status_code == 200:
             return
         for line in result.text.splitlines():

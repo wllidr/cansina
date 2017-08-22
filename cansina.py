@@ -82,6 +82,14 @@ def _prepare_proxies(proxies):
         return proxies_dict
     return {}
 
+def _make_cookie_jar(cookies):
+    d = dict()
+    c = cookies.split(',')
+    for entry in c:
+        key, value = entry.split(':')
+        d[key] = value
+    return d
+
 #
 # Parsing program options
 #
@@ -96,7 +104,8 @@ epilog = "License, requests, etc: https://github.com/deibit/cansina"
 parser = argparse.ArgumentParser(
     usage=usage, description=description, epilog=epilog)
 parser.add_argument('-A', dest='authentication',
-                    help="Basic Authentication (e.g. user:password)", default=False)
+        help="Basic Authentication (e.g: user:password)", default=False)
+parser.add_argument('-C', dest='cookies', help="your cookies (e.g: key:value)", default="")
 parser.add_argument('-D', dest='autodiscriminator',
                     help="Check for fake 404 (warning: machine decision)", action="store_true", default=False)
 parser.add_argument('-H', dest='request_type',
@@ -106,7 +115,7 @@ parser.add_argument('-P', dest='proxies',
 parser.add_argument('-S', dest='remove_slash',
                     help="Remove ending slash for payloads", default=False, action="store_true")
 parser.add_argument('-T', dest='request_delay',
-                    help="Time (a float number, e.g 0.25 or 1.75) between requests", default=0)
+        help="Time (a float number, e.g: 0.25 or 1.75) between requests", default=0)
 parser.add_argument('-U', dest='uppercase',
                     help="Make payload requests upper-case", action="store_true", default=False)
 parser.add_argument('-a', dest='user_agent',
@@ -120,7 +129,7 @@ parser.add_argument('-c', dest='content',
 parser.add_argument('-d', dest='discriminator',
                     help="If this string if found it will be treated as a 404", default=None)
 parser.add_argument('-e', dest='extension',
-                    help="Extension list to use ex: php,asp,...(default none)", default="")
+                    help="Extension list to use e.g: php,asp,...(default none)", default="")
 parser.add_argument('-p', dest='payload',
                     help="Path to the payload file to use", default=None)
 parser.add_argument('-s', dest='size_discriminator',
@@ -160,6 +169,7 @@ banned_response_codes = args.banned.split(',')
 unbanned_response_codes = args.unbanned.split(',')
 user_agent = args.user_agent
 proxy = _prepare_proxies(args.proxies.split(','))
+cookies = args.cookies
 
 request_type = args.request_type
 if request_type:
@@ -200,7 +210,9 @@ if autodiscriminator:
         print("404 ---> PAGE_MD5 ----> " + autodiscriminator_md5)
 
 print("Banned response codes: %s" % " ".join(banned_response_codes))
-print("unBanned response codes: %s" % " ".join(unbanned_response_codes))
+
+if not unbanned_response_codes[0] == '':
+    print("unBanned response codes: %s" % " ".join(unbanned_response_codes))
 
 if not extension == ['']:
     print("Extensions to probe: %s" % " ".join(extension))
@@ -218,10 +230,13 @@ payload = None
 parse_robots = args.parse_robots
 remove_slash = True
 if parse_robots:
-   print("Using robots.txt as payload")
-   robots_content = process_robots(target)
-   print("Reaped %s entries" % (len(robots_content)))
-   payload_filename = robots_content
+    robots_content = process_robots(target)
+    if not robots_content:
+        print("robots.txt not found")
+        sys.exit()
+    print("Reaped %s entries" % (len(robots_content)))
+    print("Using robots.txt as payload")
+    payload_filename = robots_content
 else:
     payload_filename = args.payload
     if not payload_filename:
@@ -269,7 +284,11 @@ Visitor.set_proxy(proxy)
 Visitor.set_requests(request_type)
 Visitor.set_size_discriminator(size_discriminator)
 Visitor.set_user_agent(user_agent)
-
+try:
+    Visitor.set_cookies(_make_cookie_jar(cookies))
+except:
+    print("Error setting cookies. Review cookie string (key:value,key:value...)")
+    sys.exit()
 #
 # Create the thread_pool and start the daemonized threads
 #

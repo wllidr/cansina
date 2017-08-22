@@ -25,7 +25,7 @@ class Visitor(threading.Thread):
     requests = ""
     size_discriminator = -1
     killed = False
-
+    cookies = None
 
     @staticmethod
     def kill():
@@ -34,6 +34,10 @@ class Visitor(threading.Thread):
     @staticmethod
     def set_discriminator(discriminator):
         Visitor.discriminator = discriminator
+
+    @staticmethod
+    def set_cookies(_cookies):
+        Visitor.cookies = _cookies
 
     @staticmethod
     def set_size_discriminator(size_discriminator):
@@ -102,17 +106,17 @@ class Visitor(threading.Thread):
             if Visitor.proxy:
                 if Visitor.requests == "GET":
                     r = requests.get(task.get_complete_target(), headers=headers, proxies=Visitor.proxy, verify=False,
-                                     timeout=timeout, auth=Visitor.auth)
+                                     timeout=timeout, auth=Visitor.auth, cookies=Visitor.cookies)
                 elif Visitor.requests == "HEAD":
                     r = requests.head(task.get_complete_target(), headers=headers, proxies=Visitor.proxy, verify=False,
-                                      timeout=timeout, auth=Visitor.auth)
+                                      timeout=timeout, auth=Visitor.auth, cookies=Visitor.cookies)
             else:
                 if Visitor.requests == "GET":
                     r = requests.get(task.get_complete_target(), headers=headers, verify=False, timeout=timeout,
-                                     auth=Visitor.auth)
+                                     auth=Visitor.auth, cookies=Visitor.cookies)
                 elif Visitor.requests == "HEAD":
                     r = requests.head(task.get_complete_target(), headers=headers, verify=False, timeout=timeout,
-                                      auth=Visitor.auth)
+                                      auth=Visitor.auth, cookies=Visitor.cookies)
 
             after = time.time()
             delta = (after - now) * 1000
@@ -162,6 +166,7 @@ class Visitor(threading.Thread):
 
         except ValueError:
             # Falling back to urllib (requests doesnt want freak chars)
+            print("warning: falling back to urllib")
             now = time.time()
             r = urllib.urlopen(task.get_complete_target(), proxies=self.proxy)
             after = time.time()

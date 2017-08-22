@@ -9,7 +9,9 @@ git clone --depth=1 https://github.com/deibit/cansina
 News
 ====
 
-14-08-2017 Size filtering. Now can be a list of sizes you want to ignore
+22-08-2017  Cookie support. With option -C you can now provide a set of cookie like "JSESSIONID:blablabla,admin=1"
+
+14-08-2017  Size filtering. Now can be a list of sizes you want to ignore
 
 13-03-2017  New option: -R autoscan robots.txt and use it as a payload
 
@@ -185,6 +187,10 @@ Resume last interrupted session with all options and payload with former linenum
 *cansina.py -R*
 
 Cansina will parse the robots.txt file an use it as a payload if it exists
+
+*cansina.py -C "JSESSIONID:blablabla,admin=1"*
+
+A set of cookies will be send in the requests
 
 
 Important
