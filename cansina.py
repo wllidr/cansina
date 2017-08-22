@@ -82,9 +82,11 @@ def _prepare_proxies(proxies):
         return proxies_dict
     return {}
 
-def _make_cookie_jar(cookies):
+def _make_cookie_jar(_cookies):
     d = dict()
-    c = cookies.split(',')
+    c = _cookies.split(',')
+    if c[0] == '':
+        return d
     for entry in c:
         key, value = entry.split(':')
         d[key] = value
@@ -259,11 +261,6 @@ payload.set_banned_response_codes(banned_response_codes)
 payload.set_unbanned_response_codes(unbanned_response_codes)
 payload.set_content(content)
 
-total_requests = payload.get_total_requests()
-print("Total requests %s  (aprox: %s / thread)" %
-      (total_requests, total_requests / threads))
-payload_queue = payload.get_queue()
-
 #
 # Manager queue configuration
 #
@@ -285,10 +282,18 @@ Visitor.set_requests(request_type)
 Visitor.set_size_discriminator(size_discriminator)
 Visitor.set_user_agent(user_agent)
 try:
-    Visitor.set_cookies(_make_cookie_jar(cookies))
+    cookie_jar = _make_cookie_jar(cookies)
+    Visitor.set_cookies(cookie_jar)
+    print("Using cookies")
 except:
     print("Error setting cookies. Review cookie string (key:value,key:value...)")
     sys.exit()
+
+total_requests = payload.get_total_requests()
+print("Total requests %s  (aprox: %s / thread)" %
+      (total_requests, total_requests / threads))
+payload_queue = payload.get_queue()
+
 #
 # Create the thread_pool and start the daemonized threads
 #
