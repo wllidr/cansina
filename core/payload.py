@@ -19,7 +19,6 @@ def _populate_list_with_file(file_name, linenumber):
     if type(file_name) == list:
         tmp_list = file_name
     elif file_name == '-':
-        print "sdasdasd"
         tmp_list = sys.stdin.readlines()
     else:
         with open(file_name, 'r') as f:
