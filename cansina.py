@@ -293,7 +293,7 @@ except:
 
 total_requests = payload.get_total_requests()
 print("Total requests %s  (aprox: %s / thread)" %
-      (total_requests, total_requests / threads))
+      (total_requests, int(total_requests / threads)))
 payload_queue = payload.get_queue()
 
 #

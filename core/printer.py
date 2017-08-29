@@ -74,7 +74,7 @@ class Console:
         if sys.version_info[0] == 3:
             t_encode = target
         else:
-            t_encode = target.encode('utf-8')
+            t_encode = target.encode('utf-8', 'replace')
         to_console = to_format.format(percentage, task.response_code,
                                       task.response_size, task.number,
                                       int(task.response_time), t_encode)
