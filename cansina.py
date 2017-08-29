@@ -320,7 +320,7 @@ try:
 except KeyboardInterrupt:
     sys.stdout.write(os.linesep + "Waiting for threads to stop...")
     Visitor.kill()
-    resp = input(os.linesep + "Resume file? (Type 'y' to get) ")
+    resp = raw_input(os.linesep + "Resume file? (Type 'y' to get) ")
     if resp == 'y':
         resumer.set_line(payload_queue.get().get_number())
         with open("resume_file_" + time.strftime("%d_%m_%y_%H_%M", time.localtime()), 'w') as f:
