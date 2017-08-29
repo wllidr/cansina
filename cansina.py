@@ -281,10 +281,12 @@ Visitor.set_proxy(proxy)
 Visitor.set_requests(request_type)
 Visitor.set_size_discriminator(size_discriminator)
 Visitor.set_user_agent(user_agent)
+
 try:
     cookie_jar = _make_cookie_jar(cookies)
     Visitor.set_cookies(cookie_jar)
-    print("Using cookies")
+    if cookie_jar:
+        print("Using cookies")
 except:
     print("Error setting cookies. Review cookie string (key:value,key:value...)")
     sys.exit()
@@ -318,7 +320,7 @@ try:
 except KeyboardInterrupt:
     sys.stdout.write(os.linesep + "Waiting for threads to stop...")
     Visitor.kill()
-    resp = raw_input(os.linesep + "Resume file? (Type 'y' to get) ")
+    resp = input(os.linesep + "Resume file? (Type 'y' to get) ")
     if resp == 'y':
         resumer.set_line(payload_queue.get().get_number())
         with open("resume_file_" + time.strftime("%d_%m_%y_%H_%M", time.localtime()), 'w') as f:

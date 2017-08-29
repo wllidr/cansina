@@ -82,6 +82,10 @@ cansina.py -h for a comprehensive list of features and choices
 
 Will make GET requests using 4 threads by default 
 
+or reading from stdin...
+
+*cat payload | cansina.py -u target_url -p -*
+
 **Banning HTTP responde codes to output**
 
 *cansina.py -u target_url -p payload_filename -b 404,400,500*
@@ -188,6 +192,8 @@ Resume last interrupted session with all options and payload with former linenum
 
 Cansina will parse the robots.txt file an use it as a payload if it exists
 
+**Cookies**
+
 *cansina.py -C "JSESSIONID:blablabla,admin=1"*
 
 A set of cookies will be send in the requests
@@ -208,7 +214,7 @@ Dependencies
 ------------
 
 - [requests](https://github.com/kennethreitz/requests)
-- Python 2.7.x 
+- Python 2.7.x or Python 3
 
 Payloads
 --------
