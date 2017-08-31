@@ -145,7 +145,7 @@ parser.add_argument('-r', dest='resume',
 parser.add_argument('-R', dest="parse_robots", action="store_true",
                     help="Parse robots.txt and check its contents", default=False)
 parser.add_argument('--recursive', dest="recursive",
-                    help="Recursive descend on previously found directories", default=False, action="store_true")
+                    help="Recursive descend on path directories", default=False, action="store_true")
 args = parser.parse_args()
 
 # Initialize a Resumer object
