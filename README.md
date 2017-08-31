@@ -9,6 +9,10 @@ git clone --depth=1 https://github.com/deibit/cansina
 News
 ====
 
+31-08-2017  Added recursive (--recursive) feature
+
+31-08-2017  Support for Python 3 has been tested and seems stable
+
 22-08-2017  Cookie support. With option -C you can now provide a set of cookie like "JSESSIONID:blablabla,admin=1"
 
 14-08-2017  Size filtering. Now can be a list of sizes you want to ignore
@@ -70,6 +74,7 @@ Features
 - Data persistence
 - Basic Authentication
 - Resume
+- Recursion on path
 
 Usage
 -----
@@ -197,6 +202,17 @@ Cansina will parse the robots.txt file an use it as a payload if it exists
 *cansina.py -C "JSESSIONID:blablabla,admin=1"*
 
 A set of cookies will be send in the requests
+
+**Recursion**
+
+*cansina.py -u <target> -p <payload> --recursive*
+
+Cansina will made multiple recursive requests on path components:
+
+http://target/path1/path2/path3/
+http://target/path1/path2/
+http://target/path1/
+http://target/
 
 
 Important

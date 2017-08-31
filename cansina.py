@@ -144,6 +144,8 @@ parser.add_argument('-r', dest='resume',
                     help="Resume a session", default=False)
 parser.add_argument('-R', dest="parse_robots", action="store_true",
                     help="Parse robots.txt and check its contents", default=False)
+parser.add_argument('--recursive', dest="recursive",
+                    help="Recursive descend on previously found directories", default=False, action="store_true")
 args = parser.parse_args()
 
 # Initialize a Resumer object
@@ -164,6 +166,10 @@ if not args.target:
     parser.print_help()
     sys.exit()
 target = _prepare_target(args.target)
+
+recursive = args.recursive
+if args.recursive:
+    print("Recursive requests will be made!")
 
 extension = args.extension.split(',')
 threads = int(args.threads)
@@ -260,6 +266,7 @@ payload.set_uppercase(uppercase)
 payload.set_banned_response_codes(banned_response_codes)
 payload.set_unbanned_response_codes(unbanned_response_codes)
 payload.set_content(content)
+payload.set_recursive(recursive)
 
 #
 # Manager queue configuration
@@ -291,11 +298,10 @@ except:
     print("Error setting cookies. Review cookie string (key:value,key:value...)")
     sys.exit()
 
+payload_queue = payload.get_queue()
 total_requests = payload.get_total_requests()
 print("Total requests %s  (aprox: %s / thread)" %
       (total_requests, int(total_requests / threads)))
-payload_queue = payload.get_queue()
-
 #
 # Create the thread_pool and start the daemonized threads
 #
@@ -320,7 +326,7 @@ try:
 except KeyboardInterrupt:
     sys.stdout.write(os.linesep + "Waiting for threads to stop...")
     Visitor.kill()
-    resp = raw_input(os.linesep + "Resume file? (Type 'y' to get) ")
+    resp = raw_input(os.linesep + "Keep a resume file? [y/N] ")
     if resp == 'y':
         resumer.set_line(payload_queue.get().get_number())
         with open("resume_file_" + time.strftime("%d_%m_%y_%H_%M", time.localtime()), 'w') as f:
