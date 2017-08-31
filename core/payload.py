@@ -1,6 +1,7 @@
 import sys
 import threading
 import time
+import fileinput
 
 try:
     import Queue
@@ -35,7 +36,9 @@ def _populate_list_with_file(file_name, linenumber):
     if type(file_name) == list:
         tmp_list = file_name
     elif file_name == '-':
-        tmp_list = sys.stdin.readlines()
+        tmp_list = []
+        for line in fileinput.input(files=file_name):
+            tmp_list.append(line)
     else:
         try:
             with open(file_name, 'r') as f:
@@ -47,7 +50,6 @@ def _populate_list_with_file(file_name, linenumber):
                 sys.exit()
 
     clean_list = []
-
     for e in tmp_list:
         # Delete leading and trailing spaces
         e = e.strip()
@@ -62,7 +64,6 @@ def _populate_list_with_file(file_name, linenumber):
             e_encode = e
         else:
             e_encode = e.decode('utf-8', 'replace')
-
         clean_list.append(e)
 
     return clean_list
