@@ -209,13 +209,13 @@ A set of cookies will be send in the requests
 
 Cansina will made multiple recursive requests on path components:
 
-http://target/path1/path2/path3/
+hxxp://target/path1/path2/path3/
 
-http://target/path1/path2/
+hxxp://target/path1/path2/
 
-http://target/path1/
+hxxp://target/path1/
 
-http://target/
+hxxp://target/
 
 
 Important
