@@ -7,7 +7,23 @@ try:
 except:
     import queue as Queue
 
+try:
+    import urlparse
+except:
+    import urllib.parse as urlparse
+
 from core.task import Task
+
+def _get_url_components(target):
+    ''' Get a url and returns multiple paths composed by recursive components'''
+    path = [i for i in urlparse.urlparse(target).path.split('/') if len(i) > 0]
+    temp_path = ""
+    list_path = ['/']
+    for component in path:
+        sub = "/%s" % component
+        temp_path += sub
+        list_path.append(temp_path + '/')
+    return list_path
 
 
 def _populate_list_with_file(file_name, linenumber):
@@ -21,9 +37,14 @@ def _populate_list_with_file(file_name, linenumber):
     elif file_name == '-':
         tmp_list = sys.stdin.readlines()
     else:
-        with open(file_name, 'r') as f:
-            tmp_list = f.readlines()
-            tmp_list = tmp_list[linenumber:]
+        try:
+            with open(file_name, 'r') as f:
+                tmp_list = f.readlines()
+                tmp_list = tmp_list[linenumber:]
+        except (OSError, IOError) as e:
+                print("[Error] Opening payload")
+                print(e)
+                sys.exit()
 
     clean_list = []
 
@@ -63,12 +84,15 @@ class Payload():
         self.queue = Queue.Queue()
         self.dead = False
         self.extensions = None
-        self.length = len(self.payload)
         self.banned_response_codes = None
         self.unbanned_response_codes = None
         self.content = None
         self.remove_slash = False
         self.uppercase = False
+        self.recursive = False
+
+    def set_recursive(self, recursion):
+        self.recursive = recursion
 
     def set_remove_slash(self, remove_slash):
         self.remove_slash = remove_slash
@@ -86,10 +110,10 @@ class Payload():
         self.content = content
 
     def get_length(self):
-        return self.length
+        return self.queue.qsize()
 
     def get_total_requests(self):
-        return self.length * len(self.extensions)
+        return self.get_length() * len(self.extensions)
 
     def kill(self):
         self.dead = True
@@ -100,13 +124,12 @@ class Payload():
     def set_uppercase(self, uppercase):
         self.uppercase = uppercase
 
-    def get_queue(self):
-        task_id = self.linenumber
 
+    def _feed_queue(self):
+        task_id = self.linenumber
         for resource in self.payload:
             if self.uppercase:
                 resource = resource.upper()
-
             task_id += 1
 
             # Useful when looking for files without extension instead of directories
@@ -125,10 +148,22 @@ class Payload():
 
                 task = Task(task_id, self.target, resource, extension)
                 task.set_payload_filename(self.payload_filename)
-                task.set_payload_length(self.length)
+                task.set_payload_length(len(self.payload))
                 task.set_banned_response_codes(self.banned_response_codes)
                 task.set_unbanned_response_codes(self.unbanned_response_codes)
                 task.set_content(self.content)
                 self.queue.put(task)
 
+    def get_queue(self):
+        if self.recursive:
+            # save main component (scheme + netloc...)
+            path = urlparse.urlparse(self.target).path
+            saved_main_component = self.target[:self.target.find(path)]
+
+            # iterate over generated multiple paths
+            for i in _get_url_components(self.target):
+                self.target = saved_main_component + i
+                self._feed_queue()
+        else:
+            self._feed_queue()
         return self.queue

@@ -6,7 +6,7 @@ import threading
 
 try:
     import requests
-    from bs4 import BeautifulSoup
+    from BeautifulSoup import BeautifulSoup
 except:
     print("[CRAWLER] Oops, check your dependencies are installed")
     print("[CRAWLER] pip install requests bs4")
