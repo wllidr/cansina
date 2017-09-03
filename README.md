@@ -219,7 +219,7 @@ hxxp://target/path1/
 
 hxxp://target/
 
-** Persistent connections **
+**Persistent connections**
 
 *cansina.py -u <target> -p <payload> --persist*
 
