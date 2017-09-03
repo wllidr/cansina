@@ -10,7 +10,7 @@ strict_codes = ['100', '200', '300', '301', '302', '401', '403', '405', '500']
 try:
     import requests
 except ImportError:
-    print("[CANSINA] Faltal Python module requests not found (install it with pip install requests)")
+    print("[CANSINA] Faltal Python module requests not found (install it with pip install --user requests)")
     sys.exit(1)
 
 
@@ -80,7 +80,7 @@ class Visitor(threading.Thread):
         self.payload = payload
         self.results = results.get_results_queue()
         self.__time = []
-
+        self.session = None
 
     def run(self):
         try:
@@ -102,20 +102,22 @@ class Visitor(threading.Thread):
             now = time.time()
             timeout = sum(self.__time) / len(self.__time) if self.__time else 10
 
+            if not self.session:
+                self.session = requests.Session()
             r = None
             if Visitor.proxy:
                 if Visitor.requests == "GET":
-                    r = requests.get(task.get_complete_target(), headers=headers, proxies=Visitor.proxy, verify=False,
+                    r = self.session.get(task.get_complete_target(), headers=headers, proxies=Visitor.proxy, verify=False,
                                      timeout=timeout, auth=Visitor.auth, cookies=Visitor.cookies)
                 elif Visitor.requests == "HEAD":
-                    r = requests.head(task.get_complete_target(), headers=headers, proxies=Visitor.proxy, verify=False,
+                    r = self.session.head(task.get_complete_target(), headers=headers, proxies=Visitor.proxy, verify=False,
                                       timeout=timeout, auth=Visitor.auth, cookies=Visitor.cookies)
             else:
                 if Visitor.requests == "GET":
-                    r = requests.get(task.get_complete_target(), headers=headers, verify=False, timeout=timeout,
+                    r = self.session.get(task.get_complete_target(), headers=headers, verify=False, timeout=timeout,
                                      auth=Visitor.auth, cookies=Visitor.cookies)
                 elif Visitor.requests == "HEAD":
-                    r = requests.head(task.get_complete_target(), headers=headers, verify=False, timeout=timeout,
+                    r = self.session.head(task.get_complete_target(), headers=headers, verify=False, timeout=timeout,
                                       auth=Visitor.auth, cookies=Visitor.cookies)
 
             after = time.time()
