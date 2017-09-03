@@ -9,6 +9,8 @@ git clone --depth=1 https://github.com/deibit/cansina
 News
 ====
 
+03-09-2017  Added persistent connections (--persist). You will definitely want this.
+
 31-08-2017  Added recursive (--recursive) feature
 
 31-08-2017  Support for Python 3 has been tested and seems stable
@@ -217,6 +219,11 @@ hxxp://target/path1/
 
 hxxp://target/
 
+** Persistent connections **
+
+*cansina.py -u <target> -p <payload> --persist*
+
+All requests will be made with persistent connections
 
 Important
 ---------

@@ -146,6 +146,8 @@ parser.add_argument('-R', dest="parse_robots", action="store_true",
                     help="Parse robots.txt and check its contents", default=False)
 parser.add_argument('--recursive', dest="recursive",
                     help="Recursive descend on path directories", default=False, action="store_true")
+parser.add_argument('--persist', dest="persist",
+                    help="Use HTTP persistent connections", default=False, action="store_true")
 args = parser.parse_args()
 
 # Initialize a Resumer object
@@ -170,6 +172,11 @@ target = _prepare_target(args.target)
 recursive = args.recursive
 if args.recursive:
     print("Recursive requests will be made!")
+
+# Persistent connections
+persist = args.persist
+if persist:
+    print("Activated persistent connections")
 
 extension = args.extension.split(',')
 threads = int(args.threads)
@@ -288,6 +295,7 @@ Visitor.set_proxy(proxy)
 Visitor.set_requests(request_type)
 Visitor.set_size_discriminator(size_discriminator)
 Visitor.set_user_agent(user_agent)
+Visitor.set_persist(persist)
 
 try:
     cookie_jar = _make_cookie_jar(cookies)

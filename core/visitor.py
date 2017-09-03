@@ -26,6 +26,7 @@ class Visitor(threading.Thread):
     size_discriminator = -1
     killed = False
     cookies = None
+    persist = False
 
     @staticmethod
     def kill():
@@ -74,6 +75,10 @@ class Visitor(threading.Thread):
     def set_authentication(auth):
         Visitor.auth = tuple(auth.split(':')) if auth else auth
 
+    @staticmethod
+    def set_persist(persist):
+        Visitor.persist = persist
+
     def __init__(self, visitor_id, payload, results):
         threading.Thread.__init__(self)
         self.visitor_id = visitor_id
@@ -102,8 +107,13 @@ class Visitor(threading.Thread):
             now = time.time()
             timeout = sum(self.__time) / len(self.__time) if self.__time else 10
 
-            if not self.session:
-                self.session = requests.Session()
+            # Persistent connections
+            if Visitor.persist:
+                if not self.session:
+                    self.session = requests.Session()
+            else:
+                self.session = requests
+
             r = None
             if Visitor.proxy:
                 if Visitor.requests == "GET":
