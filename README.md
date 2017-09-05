@@ -9,7 +9,7 @@ git clone --depth=1 https://github.com/deibit/cansina
 Changelog
 =========
 
-[https://github.com/deibit/cansina/CHANGELOG.md](https://github.com/deibit/cansina/CHANGELOG.md)
+[https://github.com/deibit/cansina/blob/master/CHANGELOG.md](https://github.com/deibit/cansina/blob/master/CHANGELOG.md)
 
 
 Cansina
