@@ -324,6 +324,7 @@ for visitor_id in range(0, threads):
 #   Run the main thread until manager exhaust all tasks
 #
 time_before_running = time.time()
+Console.start_eta_queue(30, total_requests)
 Console.header()
 
 try:

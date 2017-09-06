@@ -97,7 +97,6 @@ class Visitor(threading.Thread):
         except:
             pass
 
-
     def visit(self, task):
         try:
             headers = {}
@@ -117,18 +116,38 @@ class Visitor(threading.Thread):
             r = None
             if Visitor.proxy:
                 if Visitor.requests == "GET":
-                    r = self.session.get(task.get_complete_target(), headers=headers, proxies=Visitor.proxy, verify=False,
-                                     timeout=timeout, auth=Visitor.auth, cookies=Visitor.cookies)
+                    r = self.session.get(task.get_complete_target(),
+                                         headers=headers,
+                                         proxies=Visitor.proxy,
+                                         verify=False,
+                                         timeout=timeout,
+                                         auth=Visitor.auth,
+                                         cookies=Visitor.cookies)
+
                 elif Visitor.requests == "HEAD":
-                    r = self.session.head(task.get_complete_target(), headers=headers, proxies=Visitor.proxy, verify=False,
-                                      timeout=timeout, auth=Visitor.auth, cookies=Visitor.cookies)
+                    r = self.session.head(task.get_complete_target(),
+                                          headers=headers,
+                                          proxies=Visitor.proxy,
+                                          verify=False,
+                                          timeout=timeout,
+                                          auth=Visitor.auth,
+                                          cookies=Visitor.cookies)
             else:
                 if Visitor.requests == "GET":
-                    r = self.session.get(task.get_complete_target(), headers=headers, verify=False, timeout=timeout,
-                                     auth=Visitor.auth, cookies=Visitor.cookies)
+                    r = self.session.get(task.get_complete_target(),
+                                         headers=headers,
+                                         verify=False,
+                                         timeout=timeout,
+                                         auth=Visitor.auth,
+                                         cookies=Visitor.cookies)
+
                 elif Visitor.requests == "HEAD":
-                    r = self.session.head(task.get_complete_target(), headers=headers, verify=False, timeout=timeout,
-                                      auth=Visitor.auth, cookies=Visitor.cookies)
+                    r = self.session.head(task.get_complete_target(),
+                                          headers=headers,
+                                          verify=False,
+                                          timeout=timeout,
+                                          auth=Visitor.auth,
+                                          cookies=Visitor.cookies)
 
             after = time.time()
             delta = (after - now) * 1000
@@ -173,7 +192,7 @@ class Visitor(threading.Thread):
 
         except (requests.ConnectionError, requests.Timeout):
             # sys.stderr.write("Connection (or/and) timeout error" + os.linesep)
-            #TODO log to a file instead of screen
+            # TODO log to a file instead of screen
             pass
 
         except ValueError:
