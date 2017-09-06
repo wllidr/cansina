@@ -6,10 +6,10 @@ pip install --user requests
 git clone --depth=1 https://github.com/deibit/cansina
 
 
-Changelog
-=========
+News
+====
 
-[https://github.com/deibit/cansina/blob/master/CHANGELOG.md](https://github.com/deibit/cansina/blob/master/CHANGELOG.md)
+[CHANGELOG](https://github.com/deibit/cansina/blob/master/CHANGELOG.md)
 
 
 Cansina
@@ -48,12 +48,14 @@ Features
 - Persistent connections
 - Complementary tools
 
+
 Usage
 -----
 
 cansina.py -h for a comprehensive list of features and choices.
 
 Look up the [wiki](https://github.com/deibit/cansina/wiki), it's full of information.
+
 
 Important
 ---------
@@ -72,6 +74,7 @@ Dependencies
 - [requests](https://github.com/kennethreitz/requests)
 - Python 2.7.x or Python 3
 
+
 Payloads
 --------
 
@@ -79,6 +82,7 @@ Cansina does not come with list but there are some neat projects to supply this:
 
 - [SecList](https://github.com/danielmiessler/SecLists)
 - [fuzzdb](https://code.google.com/p/fuzzdb/)
+
 
 License information
 -------------------
