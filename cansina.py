@@ -30,8 +30,10 @@ if ver.major == 2 and ver.minor == 7 and ver.micro < 9:
     print("[!] Python < 2.7.9 - SSL Warnings disabled")
     from requests.packages.urllib3.exceptions import InsecureRequestWarning
     from requests.packages.urllib3.exceptions import InsecurePlatformWarning
+    from requests.packages.urllib3.exceptions import SNIMissingWarning
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
     requests.packages.urllib3.disable_warnings(InsecurePlatformWarning)
+    requests.packages.urllib3.disable_warnings(SNIMissingWarning)
 del ver
 
 try:
