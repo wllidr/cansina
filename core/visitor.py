@@ -195,8 +195,9 @@ class Visitor(threading.Thread):
             # TODO log to a file instead of screen
             pass
 
-        except ValueError:
+        except ValueError as e:
             # Falling back to urllib (requests doesnt want freak chars)
+            print(e)
             print("warning: falling back to urllib")
             now = time.time()
             r = urllib.urlopen(task.get_complete_target(), proxies=self.proxy)

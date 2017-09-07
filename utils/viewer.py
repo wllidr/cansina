@@ -84,6 +84,7 @@ if used_payloads:
 try:
     with sqlite3.connect(project_name) as connection:
         cursor = connection.cursor()
+        connection.text_factory = str
         cursor.execute(QUERY)
         data = cursor.fetchall()
 
@@ -169,6 +170,7 @@ def tree():
     tree = {'/': {}}
 
     def _put_into_dict(root, resource):
+        resource = resource.decode('UTF-8', 'replace')
         component = resource.split('/')[0]
         if not component:
             return

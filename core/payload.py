@@ -41,13 +41,22 @@ def _populate_list_with_file(file_name, linenumber):
             tmp_list.append(line)
     else:
         try:
-            with open(file_name, 'r') as f:
-                tmp_list = f.readlines()
-                tmp_list = tmp_list[linenumber:]
+            if sys.version_info > (3, 0):
+                f =  open(file_name, 'r', encoding="latin-1")
+            else:
+                f =  open(file_name, 'r')
+            tmp_list = f.readlines()
+            tmp_list = tmp_list[linenumber:]
+
         except (OSError, IOError) as e:
-                print("[Error] Opening payload")
-                print(e)
-                sys.exit()
+            print("[Error] Opening payload")
+            print(e)
+            f.close()
+            sys.exit()
+
+        finally:
+            f.close()
+
 
     clean_list = []
     for e in tmp_list:
@@ -64,7 +73,7 @@ def _populate_list_with_file(file_name, linenumber):
             e_encode = e
         else:
             e_encode = e.decode('utf-8', 'replace')
-        clean_list.append(e)
+        clean_list.append(e_encode)
 
     return clean_list
 
@@ -124,7 +133,6 @@ class Payload():
 
     def set_uppercase(self, uppercase):
         self.uppercase = uppercase
-
 
     def _feed_queue(self):
         task_id = self.linenumber

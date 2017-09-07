@@ -25,6 +25,7 @@ class DBManager():
                 os.mkdir(OUTPUT_DIR)
             try:
                 connection = sqlite3.connect(self.database_path)
+                connection.text_factory = str
                 cursor = connection.cursor()
                 cursor.execute("CREATE TABLE requests (\
                                 line_number INTEGER, \
@@ -70,14 +71,18 @@ class DBManager():
     def process(self, task):
         connection = sqlite3.connect(self.database_path)
         cursor = connection.cursor()
+        connection.text_factory = str
         # Check if the record already exists
         record = {"url": task.target, "resource": task.resource, "extension": task.extension,
                   "response_code": task.response_code}
-        cursor.execute("SELECT * FROM requests WHERE \
-                        url=:url AND \
-                        resource=:resource AND \
-                        extension=:extension AND \
-                        response_code=:response_code", record)
+        try:
+            cursor.execute("SELECT * FROM requests WHERE \
+                            url=:url AND \
+                            resource=:resource AND \
+                            extension=:extension AND \
+                            response_code=:response_code", record)
+        except Exception as e:
+            print(e)
         # TODO banned response code at user will
         if not cursor.fetchone():
             if not task.response_code == "404":
