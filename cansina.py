@@ -22,10 +22,18 @@ from core.resumer import Resumer
 from plugins.robots import process_robots
 from plugins.inspector import Inspector
 
-# Workaround from: http://stackoverflow.com/questions/27981545/
 import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+# Workaround for Python SSL Insecure*Warnings
+ver = sys.version_info
+if ver.major == 2 and ver.minor == 7 and ver.micro < 9:
+    print("[!] Python < 2.7.9 - SSL Warnings disabled")
+    from requests.packages.urllib3.exceptions import InsecureRequestWarning
+    from requests.packages.urllib3.exceptions import InsecurePlatformWarning
+    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+    requests.packages.urllib3.disable_warnings(InsecurePlatformWarning)
+del ver
+
 try:
     raw_input          # Python 2
 except NameError:
