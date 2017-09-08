@@ -1,7 +1,7 @@
 Install
 =======
 
-pip install --user requests
+pip install --user requests[security]
 
 git clone --depth=1 https://github.com/deibit/cansina
 

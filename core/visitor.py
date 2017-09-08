@@ -4,14 +4,10 @@ import sys
 import urllib
 import hashlib
 
+import requests
+
 unuseful_codes = ['404']
 strict_codes = ['100', '200', '300', '301', '302', '401', '403', '405', '500']
-
-try:
-    import requests
-except ImportError:
-    print("[CANSINA] Faltal Python module requests not found (install it with pip install --user requests)")
-    sys.exit(1)
 
 
 class Visitor(threading.Thread):
@@ -190,24 +186,24 @@ class Visitor(threading.Thread):
             if Visitor.delay:
                 time.sleep(Visitor.delay)
 
-        except (requests.ConnectionError, requests.Timeout):
-            # sys.stderr.write("Connection (or/and) timeout error" + os.linesep)
-            # TODO log to a file instead of screen
-            pass
+        # except (requests.ConnectionError, requests.Timeout) as e:
+        #     # sys.stderr.write("Connection (or/and) timeout error" + os.linesep)
+        #     # TODO log to a file instead of screen
+        #     print e
 
-        except ValueError as e:
-            # Falling back to urllib (requests doesnt want freak chars)
+        # except ValueError as e:
+        #     # Falling back to urllib (requests doesnt want freak chars)
+        #     print(e)
+        #     print("warning: falling back to urllib")
+        #     now = time.time()
+        #     r = urllib.urlopen(task.get_complete_target(), proxies=self.proxy)
+        #     after = time.time()
+        #     delta = (after - now) * 1000
+        #     task.set_response_code(r.code)
+        #     c = r.readlines()
+        #     task.response_time = delta
+        #     task.response_size = len(c)
+        #     self.results.put(task)
+
+        except Exception as e:
             print(e)
-            print("warning: falling back to urllib")
-            now = time.time()
-            r = urllib.urlopen(task.get_complete_target(), proxies=self.proxy)
-            after = time.time()
-            delta = (after - now) * 1000
-            task.set_response_code(r.code)
-            c = r.readlines()
-            task.response_time = delta
-            task.response_size = len(c)
-            self.results.put(task)
-
-        except Exception:
-            pass

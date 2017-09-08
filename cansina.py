@@ -12,6 +12,14 @@ try:
 except:
     import urllib.parse as urlparse
 
+try:
+    import requests
+    import urllib3
+    urllib3.disable_warnings()
+except ImportError:
+    print("[CANSINA] Faltal Python module requests not found (install it with pip install --user requests)")
+    sys.exit(1)
+
 from datetime import timedelta
 
 from core.visitor import Visitor
@@ -21,8 +29,6 @@ from core.printer import Console
 from core.resumer import Resumer
 from plugins.robots import process_robots
 from plugins.inspector import Inspector
-
-import requests
 
 # Workaround for Python SSL Insecure*Warnings
 ver = sys.version_info
