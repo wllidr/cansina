@@ -164,6 +164,8 @@ parser.add_argument('--recursive', dest="recursive",
                     help="Recursive descend on path directories", default=False, action="store_true")
 parser.add_argument('--persist', dest="persist",
                     help="Use HTTP persistent connections", default=False, action="store_true")
+parser.add_argument('--full-path', dest="full_path",
+                    help="Show full path instead of only resources", default=False, action="store_true")
 args = parser.parse_args()
 
 # Initialize a Resumer object
@@ -336,11 +338,15 @@ for visitor_id in range(0, threads):
     v.daemon = True
     v.start()
 
+# Select if full path is prefered
+full_path = args.full_path
+
 #
 #   Run the main thread until manager exhaust all tasks
 #
 time_before_running = time.time()
 Console.start_eta_queue(30, total_requests)
+Console.show_full_path = full_path
 Console.header()
 
 try:

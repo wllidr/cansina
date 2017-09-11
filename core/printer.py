@@ -25,7 +25,6 @@ try:
     rows, columns = p.read().split()
     p.close()
     COLUMNS = int(columns)
-    pass
 except:
     pass
 
@@ -62,6 +61,7 @@ class ETAQueue:
 class Console:
     eta_queue = None
     eta = "999h 59m 59s"
+    show_full_path = False
 
     @staticmethod
     def start_eta_queue(size, payload_length):
@@ -113,6 +113,11 @@ class Console:
             t_encode = target
         else:
             t_encode = target.encode('utf-8')
+
+        # User wants to see full path
+        if Console.show_full_path:
+            t_encode = task.target[:-1] + t_encode
+
 
         # Fix three characters off by one on screen
         if percentage == 100:

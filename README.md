@@ -3,6 +3,8 @@ Install
 
 pip install --user requests[security]
 
+(try removing --user and install with sudo in case of errors)
+
 git clone --depth=1 https://github.com/deibit/cansina
 
 
