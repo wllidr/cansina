@@ -47,10 +47,10 @@ class ETAQueue:
         (r_minutes, minutes) = (r_hours % mseconds_in_a_minute, int(r_hours / mseconds_in_a_minute))
         (r_seconds, seconds) = (r_minutes % mseconds_in_a_second, int(r_minutes / mseconds_in_a_second))
 
-        if hours > 999:
+        if hours > 99:
             (hours, minutes, seconds) = ('NO','TE','ND')
 
-        return "{0:3}h {1:2}m {2:2}s".format(hours, minutes, seconds)
+        return "{0:2}h{1:2}m{2:2}s".format(hours, minutes, seconds)
 
     def set_time(self, time):
         self.pending_requests -= 1
@@ -60,8 +60,9 @@ class ETAQueue:
 
 class Console:
     eta_queue = None
-    eta = "999h 59m 59s"
+    eta = "000h 00m 00s"
     show_full_path = False
+    show_content_type = False
 
     @staticmethod
     def start_eta_queue(size, payload_length):
@@ -69,14 +70,16 @@ class Console:
 
     @staticmethod
     def header():
-        header = os.linesep + " % | COD |    SIZE    |  line  | time |     ETA     |" \
-            + os.linesep + "-----------------------------------------------------" + os.linesep
+        header = os.linesep + "cod |    size    |  line  | time |" \
+            + os.linesep + "----------------------------------" + os.linesep
+        # header = os.linesep + " % | cod |    size    |  line  | time |     eta     |" \
+        #         + os.linesep + "-----------------------------------------------------" + os.linesep
+
         sys.stdout.write(header)
 
     @staticmethod
     def body(task):
-        counter = task.number
-        percentage = int(counter * 100 / task.get_payload_length())
+        percentage = int(task.number * 100 / task.get_payload_length())
         target = task.get_complete_target()
         target = urlparse.urlsplit(target).path
 
@@ -107,7 +110,8 @@ class Console:
         if task.content_detected:
             color = MAGENTA
 
-        to_format = color + "{0: >2} | {1: ^3} | {2: >10} | {3: >6} | {4: >4} |{5: ^11} | {6}" + ENDC
+        to_format = color + "{1: ^3} | {2: >10} | {3: >6} | {4: >4} | {7} [{0: >2}%] - {5: ^9} - {6}" + ENDC
+        to_format_without_progress = color + "{0: ^3} | {1: >10} | {2: >6} | {3: >4} | {5:^} {4}" + ENDC
 
         if sys.version_info[0] == 3:
             t_encode = target
@@ -118,7 +122,6 @@ class Console:
         if Console.show_full_path:
             t_encode = task.target[:-1] + t_encode
 
-
         # Fix three characters off by one on screen
         if percentage == 100:
             percentage = 99
@@ -127,11 +130,26 @@ class Console:
         if task.number % 10 == 0:
             Console.eta = Console.eta_queue.get_eta()
 
-        to_console = to_format.format(percentage, task.response_code,
-                                      task.response_size, task.number,
-                                      int(task.response_time),
-                                      Console.eta,
-                                      t_encode)
+        # Show or not 'Content-Type'
+        if Console.show_content_type:
+            content_type = task.response_type + " |"
+        else:
+            content_type = ""
+
+        # if an entry is about to be log, remove percentage and eta time
+        if color:
+            to_console = to_format_without_progress.format(task.response_code,
+                                                    task.response_size,
+                                                    task.number,
+                                                    int(task.response_time),
+                                                    t_encode, content_type)
+        # print with progress
+        else:
+            to_console = to_format.format(percentage, task.response_code,
+                                          task.response_size, task.number,
+                                          int(task.response_time),
+                                          Console.eta,
+                                          t_encode, content_type)
 
         sys.stdout.write(to_console[:COLUMNS-2] + linesep)
         sys.stdout.flush()

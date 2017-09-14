@@ -88,6 +88,7 @@ class Payload():
     def __init__(self, target, payload_filename, resumer):
 
         self.target = target
+        self.task_id = 0
         self.payload_filename = payload_filename if not type(payload_filename) == list else "robots.txt"
         self.linenumber = resumer.get_line()
         self.payload = _populate_list_with_file(payload_filename, self.linenumber)
@@ -100,6 +101,10 @@ class Payload():
         self.remove_slash = False
         self.uppercase = False
         self.recursive = False
+        self.total_requests = 0
+
+    def get_total_requests(self):
+        return self.total_requests
 
     def set_recursive(self, recursion):
         self.recursive = recursion
@@ -119,12 +124,6 @@ class Payload():
     def set_content(self, content):
         self.content = content
 
-    def get_length(self):
-        return self.queue.qsize()
-
-    def get_total_requests(self):
-        return self.get_length() * len(self.extensions)
-
     def kill(self):
         self.dead = True
 
@@ -135,11 +134,9 @@ class Payload():
         self.uppercase = uppercase
 
     def _feed_queue(self):
-        task_id = self.linenumber
         for resource in self.payload:
             if self.uppercase:
                 resource = resource.upper()
-            task_id += 1
 
             # Useful when looking for files without extension instead of directories
             if self.remove_slash and resource.endswith("/"):
@@ -155,9 +152,10 @@ class Payload():
                 if extension and not '.' in extension:
                     extension = '.' + extension
 
-                task = Task(task_id, self.target, resource, extension)
+                self.task_id += 1
+                task = Task(self.task_id, self.target, resource, extension)
                 task.set_payload_filename(self.payload_filename)
-                task.set_payload_length(len(self.payload))
+                task.set_payload_length(self.get_total_requests())
                 task.set_banned_response_codes(self.banned_response_codes)
                 task.set_unbanned_response_codes(self.unbanned_response_codes)
                 task.set_content(self.content)
@@ -165,14 +163,21 @@ class Payload():
 
     def get_queue(self):
         if self.recursive:
-            # save main component (scheme + netloc...)
+            url_components = _get_url_components(self.target)
+            # save main component (scheme + netloc)
             path = urlparse.urlparse(self.target).path
             saved_main_component = self.target[:self.target.find(path)]
+            self.total_requests = len(self.payload) * len(self.extensions) * len(url_components)
 
-            # iterate over generated multiple paths
-            for i in _get_url_components(self.target):
-                self.target = saved_main_component + i
+            # if user select recursive but url is just root
+            if len(url_components) == 1:
                 self._feed_queue()
+            else:
+                # iterate over generated multiple paths
+                for i in url_components:
+                    self.target = saved_main_component + i
+                    self._feed_queue()
         else:
+            self.total_requests = len(self.payload) * len(self.extensions)
             self._feed_queue()
         return self.queue

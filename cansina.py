@@ -53,7 +53,6 @@ USER_AGENT = "Mozilla/5.0 (Windows; U; MSIE 10.0; Windows NT 9.0; en-EN)"
 THREADS = 4
 MANAGER_TIMEOUT = 1
 
-
 #
 #   Utility functions
 #
@@ -166,6 +165,8 @@ parser.add_argument('--persist', dest="persist",
                     help="Use HTTP persistent connections", default=False, action="store_true")
 parser.add_argument('--full-path', dest="full_path",
                     help="Show full path instead of only resources", default=False, action="store_true")
+parser.add_argument('--show-type', dest="show_content_type",
+                            help="Show content-type in results", default=False, action="store_true")
 args = parser.parse_args()
 
 # Initialize a Resumer object
@@ -189,7 +190,7 @@ target = _prepare_target(args.target)
 
 recursive = args.recursive
 if args.recursive:
-    print("Recursive requests will be made!")
+    print("Recursive requests on")
 
 # Persistent connections
 persist = args.persist
@@ -298,8 +299,6 @@ payload.set_recursive(recursive)
 #
 database_name = urlparse.urlparse(target).hostname
 manager = DBManager(database_name)
-manager.set_timeout(MANAGER_TIMEOUT)
-
 
 #
 # Configure Visitor Objects
@@ -341,12 +340,16 @@ for visitor_id in range(0, threads):
 # Select if full path is prefered
 full_path = args.full_path
 
+# Select if user wants content-type print
+show_content_type = args.show_content_type
+
 #
 #   Run the main thread until manager exhaust all tasks
 #
 time_before_running = time.time()
 Console.start_eta_queue(30, total_requests)
 Console.show_full_path = full_path
+Console.show_content_type = show_content_type
 Console.header()
 
 try:

@@ -18,6 +18,7 @@ class Task:
         self.response_code = None
         self.response_size = None
         self.response_time = None
+        self.response_type = ""
         self.valid = True
         self.content_detected = False
 

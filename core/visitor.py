@@ -181,6 +181,12 @@ class Visitor(threading.Thread):
                     # else:
                         # task.set_response_code(r.history[0].status_code)
 
+            if 'Content-Type' in r.headers.keys():
+                try:
+                    task.response_type = r.headers['Content-Type'].split(';')[0]
+                except:
+                    pass
+
             self.results.put(task)
 
             if Visitor.delay:

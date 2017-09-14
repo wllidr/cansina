@@ -19,7 +19,6 @@ class DBManager():
 
         # Check for self.database_path, create dirs and database if they don't exists
         self.database_path = OUTPUT_DIR + database_name + SUFIX
-        self.timeout = 1
         if not os.path.isfile(self.database_path):
             if not os.path.isdir(OUTPUT_DIR):
                 os.mkdir(OUTPUT_DIR)
@@ -48,9 +47,6 @@ class DBManager():
         self.dead = False
         self.queue = Queue.Queue()
         self.database_name = database_name
-
-    def set_timeout(self, timeout):
-        self.timeout = timeout
 
     def get_a_task(self, alived):
         try:
