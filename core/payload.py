@@ -2,6 +2,9 @@ import sys
 import threading
 import time
 import fileinput
+import os
+import os.path
+import fnmatch
 
 try:
     import Queue
@@ -31,32 +34,53 @@ def _populate_list_with_file(file_name, linenumber):
     """ Open a file, read its content and strips it. Returns a list with the content
         additionally it filter and clean some splinters
     """
-    #FIXME: Garbage
-    tmp_list = None
-    if type(file_name) == list:
-        tmp_list = file_name
-    elif file_name == '-':
+    def _read_a_file_return_a_list(file_name):
+        '''
+            Small utility function. Open a file a return its content as a list
+        '''
         tmp_list = []
-        for line in fileinput.input(files=file_name):
-            tmp_list.append(line)
-    else:
         try:
             if sys.version_info > (3, 0):
                 f =  open(file_name, 'r', encoding="latin-1")
             else:
                 f =  open(file_name, 'r')
             tmp_list = f.readlines()
-            tmp_list = tmp_list[linenumber:]
-
         except (OSError, IOError) as e:
-            print("[Error] Opening payload")
+            print("[!] Opening payload. Check file, list of files or directory content.")
             print(e)
-            f.close()
             sys.exit()
+        return tmp_list
 
-        finally:
-            f.close()
+    #FIXME: Garbage
+    tmp_list = None
+    # If we receive a list then they are robots.txt entries
+    if type(file_name) == list:
+        tmp_list = file_name
+    # If filename is - we are dealing with stdin
+    elif file_name == '-':
+        tmp_list = []
+        for line in fileinput.input(files=file_name):
+            tmp_list.append(line)
+    # Single file, could be a list of lists or a single payload
+    elif os.path.isfile(file_name):
+        tmp_list = _read_a_file_return_a_list(file_name)
+        # Now is time to check if is a list or single payload
+        if not file_name.endswith('.payload'):
+            tmp_list = tmp_list[linenumber:]
+        else:
+            payload_list = tmp_list
+            tmp_list = []
+            print("[*] Trying to load {0} files as payloads".format(len(payload_list)))
+            for item in payload_list:
+                tmp_list.extend(_read_a_file_return_a_list(item.strip()))
 
+    # If we receive a dir then try to open all .txt files in there
+    elif os.path.isdir(file_name):
+        tmp_list = []
+        print("[*] Directory payload inclusion. All *.txt will be treated as a payload.")
+        for file in os.listdir(file_name):
+            if fnmatch.fnmatch(file, '*.txt'):
+                tmp_list.extend(_read_a_file_return_a_list("{0}/{1}".format(file_name, file)))
 
     clean_list = []
     for e in tmp_list:
@@ -74,7 +98,6 @@ def _populate_list_with_file(file_name, linenumber):
         else:
             e_encode = e.decode('utf-8', 'replace')
         clean_list.append(e_encode)
-
     return clean_list
 
 def _has_extension(res):
@@ -89,6 +112,8 @@ class Payload():
 
         self.target = target
         self.task_id = 0
+        # Payload may be a filename, a python list, a directory or a file with
+        # paths to multiple payload files
         self.payload_filename = payload_filename if not type(payload_filename) == list else "robots.txt"
         self.linenumber = resumer.get_line()
         self.payload = _populate_list_with_file(payload_filename, self.linenumber)

@@ -2,6 +2,10 @@ import requests
 import sys
 
 def process_robots(target):
+    '''
+        Return a list of entries if robots.txt is found and has meat otherwise
+        return None
+    '''
     interesting_entries = []
     try:
         result = requests.get(target + "robots.txt")

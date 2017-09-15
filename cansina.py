@@ -179,11 +179,11 @@ if resume:
             resumer = pickle.load(f)
             args = resumer.get_args()
     except:
-        sys.stdout.write("Could not load a correct resume file, sorry.")
+        sys.stdout.write("[!] Could not load a correct resume file, sorry.")
         sys.exit()
 
 if not args.target:
-    print("You need to specify a target")
+    print("[!] You need to specify a target")
     parser.print_help()
     sys.exit()
 target = _prepare_target(args.target)
@@ -217,7 +217,7 @@ content = args.content
 if content:
     print("Content inspection selected")
     if request_type == "HEAD":
-        print("WARNING: HEAD request render Content Inspection useless")
+        print("[!] head request render Content Inspection useless")
 
 remove_slash = args.remove_slash
 if remove_slash:
@@ -227,7 +227,7 @@ discriminator = args.discriminator
 if discriminator:
     print("Discriminator active")
     if request_type == "HEAD":
-        print("WARNING: HEAD requests renders Content Inspection useless")
+        print("[!] head requests renders discriminator by content useless")
 
 autodiscriminator = args.autodiscriminator
 autodiscriminator_location = None
@@ -266,7 +266,7 @@ remove_slash = True
 if parse_robots:
     robots_content = process_robots(target)
     if not robots_content:
-        print("robots.txt not found")
+        print("[!] robots.txt not found")
         sys.exit()
     print("Reaped %s entries" % (len(robots_content)))
     print("Using robots.txt as payload")
@@ -274,7 +274,7 @@ if parse_robots:
 else:
     payload_filename = args.payload
     if not payload_filename:
-        print("You have to specify a payload file!")
+        print("[!] You have to specify a payload")
         parser.print_help()
         sys.exit()
     print("Using payload: %s" % payload_filename)
