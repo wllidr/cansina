@@ -148,7 +148,7 @@ parser.add_argument('-d', dest='discriminator',
 parser.add_argument('-e', dest='extension',
                     help="Extension list to use e.g: php,asp,...(default none)", default="")
 parser.add_argument('-p', dest='payload',
-                    help="Path to the payload file to use", default=None)
+                    help="A single file, a file with filenames (.payload) or a directory (will do *.txt)", default=None)
 parser.add_argument('-s', dest='size_discriminator',
                     help="Will skip pages with this size in bytes (or a list of sizes 0,500,1500...)", default=False)
 parser.add_argument('-t', dest='threads', type=int,
