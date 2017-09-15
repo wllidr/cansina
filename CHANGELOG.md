@@ -1,6 +1,14 @@
 Changelog
 =========
 
+15-09-2017  Payloads can be now a single file, a directory or a file containing references to other files
+
+14-09-2017  New console interface and new option 'show-type' to reflect 'Content-Type' in output
+
+11-09-2017  Added a new option 'full-path' for show the entire path in console
+
+07-09-2017  Added an 'eta' clock 
+
 06-09-2017  Viewer (from utils/viewer.py) received some love. A tree struct view and a
             couple of filters. Give it a try (utils/viewer.py -h)
 
