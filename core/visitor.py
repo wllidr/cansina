@@ -23,6 +23,11 @@ class Visitor(threading.Thread):
     killed = False
     cookies = None
     persist = False
+    allow_redirects = False
+
+    @staticmethod
+    def allow_redirects(pref):
+        Visitor.allow_redirects = pref
 
     @staticmethod
     def kill():
@@ -94,6 +99,13 @@ class Visitor(threading.Thread):
             pass
 
     def visit(self, task):
+        def _dash_redirect(url):
+            if url == "{0}{1}/".format(task.target, task.resource):
+                return True
+            if url == "{0}{1}".format(task.target, task.resource):
+                return True
+            return False
+
         try:
             headers = {}
             if Visitor.user_agent:
@@ -118,7 +130,8 @@ class Visitor(threading.Thread):
                                          verify=False,
                                          timeout=timeout,
                                          auth=Visitor.auth,
-                                         cookies=Visitor.cookies)
+                                         cookies=Visitor.cookies,
+                                         allow_redirects=Visitor.allow_redirects)
 
                 elif Visitor.requests == "HEAD":
                     r = self.session.head(task.get_complete_target(),
@@ -127,7 +140,8 @@ class Visitor(threading.Thread):
                                           verify=False,
                                           timeout=timeout,
                                           auth=Visitor.auth,
-                                          cookies=Visitor.cookies)
+                                          cookies=Visitor.cookies,
+                                          allow_redirects=Visitor.allow_redirects)
             else:
                 if Visitor.requests == "GET":
                     r = self.session.get(task.get_complete_target(),
@@ -135,7 +149,8 @@ class Visitor(threading.Thread):
                                          verify=False,
                                          timeout=timeout,
                                          auth=Visitor.auth,
-                                         cookies=Visitor.cookies)
+                                         cookies=Visitor.cookies,
+                                         allow_redirects=Visitor.allow_redirects)
 
                 elif Visitor.requests == "HEAD":
                     r = self.session.head(task.get_complete_target(),
@@ -143,7 +158,8 @@ class Visitor(threading.Thread):
                                           verify=False,
                                           timeout=timeout,
                                           auth=Visitor.auth,
-                                          cookies=Visitor.cookies)
+                                          cookies=Visitor.cookies,
+                                          allow_redirects=Visitor.allow_redirects)
 
             after = time.time()
             delta = (after - now) * 1000
@@ -156,14 +172,13 @@ class Visitor(threading.Thread):
             if Visitor.discriminator and Visitor.discriminator in tmp_content:
                 r.status_code = '404'
 
-            #print self.banned_md5 + "  -  " + hashlib.md5("".join(tmp_content)).hexdigest()
-
             if Visitor.banned_md5 and hashlib.md5("".join(tmp_content)).hexdigest() == self.banned_md5:
                 r.status_code = '404'
 
             # Check if page size is not what we need
             if task.response_size in Visitor.size_discriminator:
                 r.status_code = '404'
+
             task.set_response_code(r.status_code)
 
             # Look for interesting content
@@ -171,15 +186,13 @@ class Visitor(threading.Thread):
                 task.content_has_detected(True)
 
             # Look for a redirection
-            # if r.history and r.history[0] and r.status_code.startswith('3'):
-                # if r.url == task.get_complete_target() + '/':
-                    # pass
-                # else:
-                    # task.set_location(r.url)
-                    # if task.location == self.banned_location:
-                        # task.set_response_code('404')
-                    # else:
-                        # task.set_response_code(r.history[0].status_code)
+            if Visitor.allow_redirects:
+                if len(r.history) > 0 and not _dash_redirect(r.history[-1].url):
+                    task.response_code = str(r.history[0].status_code)
+                    task.location = r.history[-1].url
+            else:
+                if str(r.status_code).startswith('3'):
+                    task.set_response_code('404')
 
             if 'Content-Type' in r.headers.keys():
                 try:
@@ -192,24 +205,12 @@ class Visitor(threading.Thread):
             if Visitor.delay:
                 time.sleep(Visitor.delay)
 
-        # except (requests.ConnectionError, requests.Timeout) as e:
-        #     # sys.stderr.write("Connection (or/and) timeout error" + os.linesep)
-        #     # TODO log to a file instead of screen
-        #     print e
-
-        # except ValueError as e:
-        #     # Falling back to urllib (requests doesnt want freak chars)
-        #     print(e)
-        #     print("warning: falling back to urllib")
-        #     now = time.time()
-        #     r = urllib.urlopen(task.get_complete_target(), proxies=self.proxy)
-        #     after = time.time()
-        #     delta = (after - now) * 1000
-        #     task.set_response_code(r.code)
-        #     c = r.readlines()
-        #     task.response_time = delta
-        #     task.response_size = len(c)
-        #     self.results.put(task)
+        except (requests.ConnectionError, requests.Timeout) as e:
+            # sys.stderr.write("Connection (or/and) timeout error" + os.linesep)
+            # TODO log to a file instead of screen
+            print ("[!] Timeout/Connection error")
+            print (e)
 
         except Exception as e:
-            print(e)
+            print ("[!] General exception while visiting")
+            print (e)

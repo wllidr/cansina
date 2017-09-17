@@ -167,6 +167,9 @@ parser.add_argument('--full-path', dest="full_path",
                     help="Show full path instead of only resources", default=False, action="store_true")
 parser.add_argument('--show-type', dest="show_content_type",
                             help="Show content-type in results", default=False, action="store_true")
+parser.add_argument('--no-follow', dest="allow_redirects",
+                            help="Do not follow redirections", default=True, action="store_false")
+
 args = parser.parse_args()
 
 # Initialize a Resumer object
@@ -313,6 +316,7 @@ Visitor.set_requests(request_type)
 Visitor.set_size_discriminator(size_discriminator)
 Visitor.set_user_agent(user_agent)
 Visitor.set_persist(persist)
+Visitor.allow_redirects(args.allow_redirects)
 
 try:
     cookie_jar = _make_cookie_jar(cookies)
