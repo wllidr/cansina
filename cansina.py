@@ -51,7 +51,6 @@ except NameError:
 #
 USER_AGENT = "Mozilla/5.0 (Windows; U; MSIE 10.0; Windows NT 9.0; en-EN)"
 THREADS = 4
-MANAGER_TIMEOUT = 1
 
 #
 #   Utility functions
@@ -96,6 +95,7 @@ def _prepare_proxies(proxies):
                 proxies_dict['https'] = proxy_item
         return proxies_dict
     return {}
+
 
 def _make_cookie_jar(_cookies):
     d = dict()
@@ -185,6 +185,7 @@ if resume:
         sys.stdout.write("[!] Could not load a correct resume file, sorry.")
         sys.exit()
 
+# Target check and preparation
 if not args.target:
     print("[!] You need to specify a target")
     parser.print_help()
@@ -200,6 +201,7 @@ persist = args.persist
 if persist:
     print("Activated persistent connections")
 
+# Misc options
 extension = args.extension.split(',')
 threads = int(args.threads)
 banned_response_codes = args.banned.split(',')
@@ -208,6 +210,7 @@ user_agent = args.user_agent
 proxy = _prepare_proxies(args.proxies.split(','))
 cookies = args.cookies
 
+# HEAD / GET requests
 request_type = args.request_type
 if request_type:
     print("HTTP HEAD requests")
@@ -216,22 +219,26 @@ else:
     print("HTTP GET requests")
     request_type = "GET"
 
+# Content inspecting
 content = args.content
 if content:
     print("Content inspection selected")
     if request_type == "HEAD":
         print("[!] head request render Content Inspection useless")
 
+# Remove slash (probably an ancient option)
 remove_slash = args.remove_slash
 if remove_slash:
     print("Requests without last /")
 
+# Discriminator option
 discriminator = args.discriminator
 if discriminator:
     print("Discriminator active")
     if request_type == "HEAD":
         print("[!] head requests renders discriminator by content useless")
 
+# Autodiscriminator (probably deprecated by future diagnostic subsystem)
 autodiscriminator = args.autodiscriminator
 autodiscriminator_location = None
 autodiscriminator_md5 = None
@@ -246,22 +253,24 @@ if autodiscriminator:
         autodiscriminator_md5 = result
         print("404 ---> PAGE_MD5 ----> " + autodiscriminator_md5)
 
+# Misc user information
 print("Banned response codes: %s" % " ".join(banned_response_codes))
-
 if not unbanned_response_codes[0] == '':
     print("unBanned response codes: %s" % " ".join(unbanned_response_codes))
-
 if not extension == ['']:
     print("Extensions to probe: %s" % " ".join(extension))
 
+# Uppercase
 uppercase = args.uppercase
 if uppercase:
     print("All resource requests will be done in uppercase")
 
+# Misc options
 request_delay = args.request_delay
 authentication = args.authentication
 size_discriminator = args.size_discriminator
 
+# Payload options
 #FIXME: This design is garbage
 payload = None
 parse_robots = args.parse_robots
@@ -356,6 +365,7 @@ Console.show_full_path = full_path
 Console.show_content_type = show_content_type
 Console.header()
 
+# Main loop
 try:
     while True:
         visitors_alive = any([visitor.is_alive() for visitor in thread_pool])

@@ -99,11 +99,19 @@ class Visitor(threading.Thread):
             pass
 
     def visit(self, task):
-        def _dash_redirect(url):
-            if url == "{0}{1}/".format(task.target, task.resource):
+        def _dumb_redirect(url):
+            origin = "{0}{1}".format(task.target, task.resource)
+
+            # Detect redirect to same page but ended with slash
+            if url == origin:
                 return True
-            if url == "{0}{1}".format(task.target, task.resource):
+            if url == origin + '/':
                 return True
+
+            # Detect redirect to root
+            if url == task.target:
+                return True
+
             return False
 
         try:
@@ -187,7 +195,7 @@ class Visitor(threading.Thread):
 
             # Look for a redirection
             if Visitor.allow_redirects:
-                if len(r.history) > 0 and not _dash_redirect(r.history[-1].url):
+                if len(r.history) > 0 and not _dumb_redirect(r.history[-1].url):
                     task.response_code = str(r.history[0].status_code)
                     task.location = r.history[-1].url
             else:

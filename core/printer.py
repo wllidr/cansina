@@ -19,14 +19,21 @@ else:
     ENDC = '\033[0m'
 
 COLUMNS = 80
-try:
-    # (Slightly modified) http://stackoverflow.com/a/943921/91267
-    p = os.popen('stty size', 'r')
-    rows, columns = p.read().split()
-    p.close()
-    COLUMNS = int(columns)
-except:
-    pass
+
+def _get_terminal_width():
+    '''
+        Get the terminal width to adjust columns size
+    '''
+    global COLUMNS
+    try:
+        # (Slightly modified) http://stackoverflow.com/a/943921/91267
+        p = os.popen('stty size', 'r')
+        rows, columns = p.read().split()
+        p.close()
+        COLUMNS = int(columns)
+    except:
+        pass
+_get_terminal_width()
 
 class ETAQueue:
 
@@ -59,6 +66,7 @@ class ETAQueue:
         self.times.append(time)
 
 class Console:
+    MIN_COLUMN_SIZE = 55
     eta_queue = None
     eta = "000h 00m 00s"
     show_full_path = False
@@ -72,9 +80,6 @@ class Console:
     def header():
         header = os.linesep + "cod |    size    |  line  | time |" \
             + os.linesep + "----------------------------------" + os.linesep
-        # header = os.linesep + " % | cod |    size    |  line  | time |     eta     |" \
-        #         + os.linesep + "-----------------------------------------------------" + os.linesep
-
         sys.stdout.write(header)
 
     @staticmethod
@@ -85,8 +90,8 @@ class Console:
 
         if task.location:
             target = target + " -> " + task.location
-        if len(target) > COLUMNS - 39:
-            target = target[:abs(COLUMNS - 39)]
+        if len(target) > COLUMNS - Console.MIN_COLUMN_SIZE:
+            target = target[:abs(COLUMNS - Console.MIN_COLUMN_SIZE)]
 
         # If a task is valid means that is should be printed, so a proper
         # linesep will be printed
@@ -99,12 +104,10 @@ class Console:
         color = ""
         if task.response_code == "200":
             color = GREEN
-        if task.response_code == "403":
+        if task.response_code == "401" or task.response_code == "403":
             color = RED
         if task.response_code == "301" or task.response_code == "302":
             color = LBLUE
-        if task.response_code == "401":
-            color = RED
         if task.response_code.startswith('5'):
             color = YELLOW
         if task.content_detected:
