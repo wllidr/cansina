@@ -55,6 +55,8 @@ THREADS = 4
 #
 #   Utility functions
 #
+
+
 def _check_domain(target_url):
     """Get the target url from the user, clean and return it"""
 
@@ -271,7 +273,7 @@ authentication = args.authentication
 size_discriminator = args.size_discriminator
 
 # Payload options
-#FIXME: This design is garbage
+# FIXME: This design is garbage
 payload = None
 parse_robots = args.parse_robots
 remove_slash = True

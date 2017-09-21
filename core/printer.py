@@ -68,7 +68,7 @@ class ETAQueue:
 class Console:
     MIN_COLUMN_SIZE = 55
     eta_queue = None
-    eta = "000h 00m 00s"
+    eta = "00h00m00s"
     show_full_path = False
     show_content_type = False
 
@@ -108,7 +108,7 @@ class Console:
             color = RED
         if task.response_code == "301" or task.response_code == "302":
             color = LBLUE
-        if task.response_code.startswith('5'):
+        if task.response_code.startswith('5') or task.response_code == '400':
             color = YELLOW
         if task.content_detected:
             color = MAGENTA
