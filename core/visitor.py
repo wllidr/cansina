@@ -202,7 +202,7 @@ class Visitor(threading.Thread):
                 if str(r.status_code).startswith('3'):
                     task.set_response_code('404')
 
-            if 'Content-Type' in r.headers.keys():
+            if 'content-type' in [h.lower() for h in r.headers.keys()]:
                 try:
                     task.response_type = r.headers['Content-Type'].split(';')[0]
                 except:

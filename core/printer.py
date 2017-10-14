@@ -123,7 +123,9 @@ class Console:
 
         # User wants to see full path
         if Console.show_full_path:
-            t_encode = task.target[:-1] + t_encode
+            t_encode = task.get_complete_target()
+        else:
+            t_encode = target
 
         # Fix three characters off by one on screen
         if percentage == 100:
