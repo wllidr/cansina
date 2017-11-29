@@ -171,11 +171,13 @@ parser.add_argument('--show-type', dest="show_content_type",
                             help="Show content-type in results", default=False, action="store_true")
 parser.add_argument('--no-follow', dest="allow_redirects",
                             help="Do not follow redirections", default=True, action="store_false")
+parser.add_argument('--line', dest='continue_line', type=int,
+                    help="Continue payload in line <n>", default=0)
 
 args = parser.parse_args()
 
 # Initialize a Resumer object
-resumer = Resumer(args, 0)
+resumer = Resumer(args, args.continue_line)
 resume = args.resume
 # If we are ressuming a former session revive last args object
 if resume:

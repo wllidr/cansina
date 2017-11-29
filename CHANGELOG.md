@@ -1,6 +1,8 @@
 Changelog
 =========
 
+29-11-2017  Added new option. --line <n> will continue you task on line <n>
+
 15-09-2017  Payloads can be now a single file, a directory or a file containing references to other files
 
 14-09-2017  New console interface and new option 'show-type' to reflect 'Content-Type' in output

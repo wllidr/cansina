@@ -45,10 +45,12 @@ def _populate_list_with_file(file_name, linenumber):
             else:
                 f =  open(file_name, 'r')
             tmp_list = f.readlines()
+
         except (OSError, IOError) as e:
             print("[!] Opening payload. Check file, list of files or directory content.")
             print(e)
             sys.exit()
+
         return tmp_list
 
     #FIXME: Garbage

@@ -8,6 +8,14 @@ pip install --user requests[security]
 git clone --depth=1 https://github.com/deibit/cansina
 
 
+Fast use
+========
+
+Use Python 3 (works on Python 2 too, but 3 is advisable)
+
+$ python3 cansina.py -u <site_url> -p <payload_file> 
+
+
 News
 ====
 
