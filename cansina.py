@@ -61,12 +61,12 @@ def _check_domain(target_url):
     """Get the target url from the user, clean and return it"""
 
     domain = urlparse.urlparse(target_url).hostname
-    print("Resolving " + domain)
+    print("{:30} {:>}".format("Host:", domain))
     try:
         if socket.gethostbyname(domain):
             pass
     except Exception:
-        print("Domain doesn't resolve. Check URL")
+        print("[!] Domain doesn't resolve. Check URL")
         sys.exit(1)
 
 
@@ -203,7 +203,7 @@ if args.recursive:
 # Persistent connections
 persist = args.persist
 if persist:
-    print("Activated persistent connections")
+    print("Persistent connections")
 
 # Misc options
 extension = args.extension.split(',')
@@ -217,11 +217,10 @@ cookies = args.cookies
 # HEAD / GET requests
 request_type = args.request_type
 if request_type:
-    print("HTTP HEAD requests")
     request_type = "HEAD"
 else:
-    print("HTTP GET requests")
     request_type = "GET"
+print("{:30} {:>}".format("Requests:", request_type))
 
 # Content inspecting
 content = args.content
@@ -233,7 +232,7 @@ if content:
 # Remove slash (probably an ancient option)
 remove_slash = args.remove_slash
 if remove_slash:
-    print("Requests without last /")
+    print("Requests without ending /")
 
 # Discriminator option
 discriminator = args.discriminator
@@ -258,11 +257,11 @@ if autodiscriminator:
         print("404 ---> PAGE_MD5 ----> " + autodiscriminator_md5)
 
 # Misc user information
-print("Banned response codes: %s" % " ".join(banned_response_codes))
+print("{:30} {:>}".format("Banned response codes:", ",".join(banned_response_codes)))
 if not unbanned_response_codes[0] == '':
-    print("unBanned response codes: %s" % " ".join(unbanned_response_codes))
+    print("{:30} {:>}".format("unBanned response codes:", ",".join(unbanned_response_codes)))
 if not extension == ['']:
-    print("Extensions to probe: %s" % " ".join(extension))
+    print("{:30} {:>}".format("Extensions to probe:", ",".join(extension)))
 
 # Uppercase
 uppercase = args.uppercase
@@ -293,11 +292,10 @@ else:
         print("[!] You have to specify a payload")
         parser.print_help()
         sys.exit()
-    print("Using payload: %s" % payload_filename)
-    print("Generating payloads...")
+    print("{:30} {:>}".format("Using payload:", payload_filename))
 
 payload = Payload(target, payload_filename, resumer)
-print("Spawning %s threads " % threads)
+print("{:30} {:>}".format("Threads:", threads))
 
 #
 # Payload queue configuration
@@ -337,13 +335,13 @@ try:
     if cookie_jar:
         print("Using cookies")
 except:
-    print("Error setting cookies. Review cookie string (key:value,key:value...)")
+    print("[!] Error setting cookies. Review cookie string (key:value,key:value...)")
     sys.exit()
 
 payload_queue = payload.get_queue()
 total_requests = payload.get_total_requests()
-print("Total requests %s  (aprox: %s / thread)" %
-      (total_requests, int(total_requests / threads)))
+print("{:30} {:>}".format("Total requests:",  "%s (aprox: %s / thread)" %
+      (total_requests, int(total_requests / threads))))
 #
 # Create the thread_pool and start the daemonized threads
 #
@@ -385,7 +383,7 @@ except KeyboardInterrupt:
             pickle.dump(resumer, f)
 except Exception as e:
     import traceback as tb
-    sys.stderr.write("Unknown exception: %s" % e)
+    sys.stderr.write("[!] Unknown exception: %s" % e)
     print(tb.print_tb(sys.exc_info()[2]))
 
 sys.stdout.write("Finishing...")
