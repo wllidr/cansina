@@ -177,6 +177,8 @@ class Visitor(threading.Thread):
             self.__time.append(delta)
 
             # If discriminator is found we mark it 404
+            if sys.version_info[0] >= 3:
+                tmp_content = tmp_content.decode('UTF-8')
             if Visitor.discriminator and Visitor.discriminator in tmp_content:
                 r.status_code = '404'
 
